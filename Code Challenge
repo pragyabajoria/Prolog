@@ -1,0 +1,173 @@
+remove(X,[X|L],L).
+remove(X,[Y|L],[Y|M]):-remove(X,L,M).
+
+append([],L,L).
+append([X|L],M,[X|N]):-append(L,M,N).
+
+member(X,[X|_]).
+member(X, [_|Y]):-member(X,Y).
+
+% Find the last element of a list.
+lastElem(X,[X]).
+lastElem(X,[_|L]):-lastElem(X,L).
+
+% Find the last but one element of a list.
+secondLastElem(X,[X,_|[]]).
+secondLastElem(X,[_|L]):-secondLastElem(X,L).
+
+% Find the kth element of a list.
+elementAt(X,[X|_],1).
+elementAt(X,[_|L],N):-N>1, M is N-1, elementAt(X,L,M).
+
+% Reverse a list. (using append)
+reverse([],[]).
+reverse([H|T],R):-reverse(T,Rev),append(Rev,[H],R).
+
+% Reverse a list (without using append)
+qrev(L,R):-reverse3(L,[],R).
+
+reverse3([H|T],A,R):-reverse3(T,[H|A],R).
+reverse3([],A,A).
+
+% Find out whether the list is a palindrome.
+isPalindrome(L):-reverse(L,L).
+
+% Flatten a nested list structure.
+flatten([],[]).
+flatten(X,[X]):-var(X),!.  
+flatten([H|T],L3):-flatten(H,L1),flatten(T,L2),append(L1,L2,L3).
+
+% Eliminate consecutive duplicates of list elements.
+compress([],[]).
+compress([X],[X]).
+compress([X,X|Xs],Zs):-compress([X|Xs],Zs).
+compress([X,Y|Ys],[X|Zs]):-X \= Y, compress([Y|Ys],Zs).
+
+% Pack consecutive duplicates of list elements into sublists.
+% Pack is obtained from list1 by pcking repeated occurrences of the elements into separate sublists.
+pack([],[]).
+pack([X|Xs],[Z|Zs]):-transfer(X,Xs,Ys,Z), pack(Ys,Zs).
+
+%transfer(X,Xs,Ys,Z) Ys is the list that remains from the list Xs when all leading copies of X are removed and transferred to Z.
+
+transfer(X,[],[],[X]).
+transfer(X, [Y|Ys], [Y|Ys], [X]):-X \+ Y
+transfer(X, [X|Xs], Ys, [X|Zs]):-transfer( X,Xs,Ys, Zs).
+
+% Duplicate all the elements of a list.
+dupli([],[]).
+dupli([X|Xs],[X,X|Ys]):-dupli(Xs, Ys).
+
+% Drop every nth element from a list.
+drop(L1,N,L2):-drop(L1,N,L2,N).
+
+drop([],_,[],_).
+drop([_|Xs],N,Ys,1):-drop(Xs,N,Ys,N).
+drop([X|Xs],N,[X|Ys],K1):- N > 1, K1 is N - 1, drop(Xs,N,Ys,K1).
+
+% Duplicate the elements of a list a given number of times.
+
+%
+quick_sort2(List,Sorted):-q_sort(List,[],Sorted).
+q_sort([],Acc,Acc).
+q_sort([H|T],Acc,Sorted):-
+    pivoting(H,T,L1,L2),
+    q_sort(L1,Acc,Sorted1),q_sort(L2,[H|Sorted1],Sorted)
+
+pivoting(H,[],[],[]).
+pivoting(H,[X|T],[X|L],G):-X=<H,pivoting(H,T,L,G).
+pivoting(H,[X|T],L,[X|G]):-X>H,pivoting(H,T,L,G).
+
+%shuffle
+
+% replace
+replace(_, _, [], []).
+replace(O, R, [O|T], [R|T2]) :- replace(O, R, T, T2).
+replace(O, R, [H|T], [H|T2]) :- H \= O, replace(O, R, T, T2).
+
+%Product of a list
+times(0,N,0) :- natural_number(N).
+times(s(M),N,Z) :- times(M,N,W), plus(W,N,Z).
+times(M,N,Product) :- Product is M*N.
+
+gcd(A,B,GCD) :- A = B, GCD = A.
+gcd(A,B,GCD) :- A < B, NB is B - A, gcd(A,NB,GCD).
+gcd(A,B,GCD) :- A > B, NA is A - B, gcd(NA,B,GCD).
+fib(0,1).
+fib(1,1).
+fib(N,F) :- N > 1, N1 is N - 1, N2 is N - 2,
+    fib(N1,F1), fib(N2,F2), F is F1 + F2.
+ack(0,N,A) :- A is N + 1.
+ack(M1,0,A) :- M > 0, M is M - 1, ack(M,1,A).
+ack(M1,N1,A) :- M1 > 0, N1 > 0, M is M - 1, N is N - 1,
+   ack(M1,N,A1), ack(M,A1,A).
+
+
+Prolog programming definition of the minimum.
+
+minimum(M,N,M) :- M =< N.
+minimum(M,N,N) :- N =< M.
+
+% prefix(Prefix,List) <- Prefix is a prefix of list List
+
+prefix([],List).
+prefix([X|Prefix],[X|List]) :- prefix(Prefix,List).
+
+sum([ ],0).
+sum([X|L],Sum) :- sum(L,SL), Sum is X + SL.
+
+product([ ],1).
+product([X|L],Prod) :- product(L,PL), Prod is X * PL.
+
+suffix(Suffix,Suffix).
+prefix(Suffix,[X|List]) :- suffix(Suffix,List).
+
+member(X,L) :- append(_,[X|_],L).
+prefix(Pre,L) :- append(Prefix,_,L).
+suffix(L,Suf) :- append(_,Suf,L).
+
+vowel(X) :- member(X,[a,e,i,o,u]).
+digit(D) :- member(D,['0','1','2','3','4','5','6','7','8','9']).
+
+isort([ ],[ ]).
+isort([X|UnSorted],AllSorted) :- isort(UnSorted,Sorted),
+                                 insert(X,Sorted,AllSorted).
+
+insert(X,[ ],[X]).
+insert(X,[Y|L],[X,Y|L]) :- X =< Y.
+insert(X,[Y|L],[Y|IL]) :-  X > Y, insert(X,L,IL).
+
+fac(0,1).
+fac(N,F) :- N > 0, fac(N,1,F).
+
+fac(1,F,F).
+fac(N,PP,F) :- N > 1, NPp is N*PP, M is N-1, 
+       fac(M,NPp,F).
+
+% dfs( PathSoFar, CurrentNode, PathToGoal )
+dfs_noloop(Path,Node,[Node|Path]) :-
+goal(Node).
+dfs_noloop(Path,Node,Path1) :-
+s(Node,Node1),
+\+ member(Node1,Path),
+dfs_noloop([Node|Path],Node1,Path1).
+
+bfs([[Node|Path]|_], [Node|Path]) :-
+goal(Node).
+bfs([Path|Paths], S) :-
+extend(Path,NewPaths),
+append(Paths,NewPaths,Paths1),
+bfs(Paths1,S).
+bfs_start(N,P) :- bfs([[N]],P).
+
+extending paths
+extend([Node|Path],NewPaths) :-
+bagof([NewNode,Node|Path],
+(s(Node,NewNode),
+\+ (member(NewNode,[Node|Path]))),
+NewPaths),
+!.
+%% if there are no next steps,
+%% bagof will fail and we'll fall through.
+extend(_Path,[]).
+
